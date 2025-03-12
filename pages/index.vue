@@ -1,25 +1,48 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import {ref, computed} from 'vue';
+import {useBeerStore} from "~/store/beer";
 
-const router = useRouter()
-const beerType = ref('ale')
+const beersStore = useBeerStore();
+const {fetchBeers} = beersStore;
+const {beersList, errorMessage} = storeToRefs(beersStore);
 
-const navigateToBeerType = () => {
-  router.push(`/bieres-client?type=${beerType.value}`)
-}
+await fetchBeers();
+
+const searchQuery = ref('');
+const currentPage = ref(1);
+const itemsPerPage = 10;
+
+const filteredBeers = computed(() => {
+  return beersList.value.filter(beer =>
+      beer.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
+
+const paginatedBeers = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return filteredBeers.value.slice(start, end);
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(filteredBeers.value.length / itemsPerPage);
+});
 </script>
 
 <template>
   <div>
-    <h1>Type de bière</h1>
-    <select v-model="beerType">
-      <option value="ale">IPA</option>
-      <option value="stouts">Stouts</option>
-    </select>
-    <button @click="navigateToBeerType">Voir les bières</button>
+    <input v-model="searchQuery" placeholder="Search beers..."/>
+    <div v-if="errorMessage">{{ errorMessage }}</div>
+    <div v-else>
+      <ul>
+        <li v-for="beer in paginatedBeers" :key="beer.id">{{ beer.name }}</li>
+      </ul>
+      <button @click="currentPage--" :disabled="currentPage === 1">Previous</button>
+      <button @click="currentPage++" :disabled="currentPage === totalPages">Next</button>
+    </div>
   </div>
 </template>
 
 <style scoped>
+/* Ajoutez votre style ici */
 </style>
