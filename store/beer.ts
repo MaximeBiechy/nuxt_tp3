@@ -1,7 +1,7 @@
 export const useBeerStore = defineStore("beer", {
   state: () => {
     return {
-      beers: [],
+      beers: [] as Array<{ id: number, name: string, price: string, rating: { average: number, reviews: number }, image: string }>,
       error: null as string | null,
     }
   },
