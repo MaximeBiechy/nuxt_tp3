@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/7000c3e1-2da2-430b-bf62-6f71adefc259)
+![Uploading image.png…]()
 
 # Nuxt Minimal Starter
 
