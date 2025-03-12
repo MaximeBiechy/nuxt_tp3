@@ -3,8 +3,8 @@ import {ref, computed} from 'vue';
 import {useBeerStore} from "~/store/beer";
 
 const beersStore = useBeerStore();
-const {fetchBeers} = beersStore;
-const {beersList, errorMessage} = storeToRefs(beersStore);
+const {fetchBeers, addFavorite, removeFavorite} = beersStore;
+const {beersList, errorMessage, favoriteBeers} = storeToRefs(beersStore);
 
 await fetchBeers();
 
@@ -31,6 +31,14 @@ const totalPages = computed(() => {
 const setDefaultImage = (event: Event) => {
   (event.target as HTMLImageElement).src = '/defaultBeer.jpeg';
 };
+
+const toggleFavorite = (beerId: number) => {
+  if (favoriteBeers.value.some(beer => beer.id === beerId)) {
+    removeFavorite(beerId);
+  } else {
+    addFavorite(beerId);
+  }
+};
 </script>
 
 <template>
@@ -47,6 +55,9 @@ const setDefaultImage = (event: Event) => {
             <div class="beer-name">{{ beer.name }}</div>
             <div class="beer-price">Price: {{ beer.price }}</div>
             <div class="beer-rating">Rating: {{ beer.rating.average }} ({{ beer.rating.reviews }} reviews)</div>
+            <button @click="toggleFavorite(beer.id)" class="add-favorite">
+              {{ favoriteBeers.some(fav => fav.id === beer.id) ? 'Remove from Favorites' : 'Add to Favorites' }}
+            </button>
           </div>
         </li>
       </ul>
@@ -88,6 +99,10 @@ const setDefaultImage = (event: Event) => {
 }
 
 .beer-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   background: #fff;
   border: 1px solid #eee;
   border-radius: 8px;
@@ -118,6 +133,16 @@ const setDefaultImage = (event: Event) => {
 .beer-price, .beer-rating {
   font-size: 0.9rem;
   color: #555;
+}
+
+.add-favorite {
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  border: none;
+  background: #007bff;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .pagination {
